@@ -1,196 +1,217 @@
-# 🫀 TrustECG: Explainable Multi-Label ECG Classification
+# TrustECG
+
+**Explainable AI for 12-lead ECG Classification**
 
 <div align="center">
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776ab.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-ee4c2c.svg?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
-[![Lightning](https://img.shields.io/badge/Lightning-2.1+-792ee5.svg?style=for-the-badge&logo=lightning&logoColor=white)](https://lightning.ai/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.29+-ff4b4b.svg?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.6+-ee4c2c.svg?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Lightning](https://img.shields.io/badge/Lightning-2.5+-792ee5.svg?style=for-the-badge&logo=lightning&logoColor=white)](https://lightning.ai/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.45+-ff4b4b.svg?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
 
-**AI-powered cardiac diagnosis with attention-based explainability**
-
-[Features](#-key-features) • [Installation](#-installation) • [Usage](#-usage) • [Architecture](#-architecture) • [Results](#-results) • [License](#-license)
+[Features](#key-features) • [Demo](#demo) • [Results](#results) • [Installation](#installation) • [Usage](#usage) • [Documentation](#documentation)
 
 </div>
 
 ---
 
-## 📖 Overview
+## Overview
 
-**TrustECG** is an explainable AI system for multi-label ECG classification, designed to detect 5 cardiac conditions from 12-lead electrocardiogram recordings. Built on the [PTB-XL dataset](https://physionet.org/content/ptb-xl/) (21,801 clinical ECGs), it combines state-of-the-art deep learning with comprehensive explainability to build trust in AI-assisted cardiac diagnosis.
+TrustECG is an explainable deep learning system that automatically classifies 12-lead ECG recordings into 5 cardiac conditions. Unlike traditional black-box models, TrustECG shows doctors exactly why it made each prediction through attention visualization.
 
-### Why TrustECG?
+Built on the [PTB-XL dataset](https://physionet.org/content/ptb-xl/) containing 21,801 clinical ECGs verified by cardiologists.
 
-- **Clinical Relevance**: Trained on the largest publicly available ECG dataset with cardiologist-verified annotations
-- **Explainable AI**: Understand _why_ the model makes predictions through attention visualization
-- **Multi-Label**: Detect multiple conditions simultaneously (patients often have co-occurring cardiac issues)
-- **Production-Ready**: Professional Streamlit dashboard for clinical demonstration
+**Why TrustECG?**
 
----
-
-## ✨ Key Features
-
-| Feature                               | Description                                                  |
-| ------------------------------------- | ------------------------------------------------------------ |
-| 🎯 **Multi-Label Classification**     | Simultaneously detect 5 cardiac conditions from a single ECG |
-| 🔍 **Attention-Based Explainability** | Temporal and lead-wise attention visualization               |
-| 📊 **Comprehensive XAI**              | SHAP, LIME, Grad-CAM, and occlusion sensitivity analysis     |
-| 🖥️ **Professional Dashboard**         | Feature-rich Streamlit application with dark theme           |
-| 📈 **High Performance**               | 92.1% Val AUROC, 91.2% Test AUROC                            |
-| ⚡ **Fast Inference**                 | Real-time predictions on consumer hardware                   |
+- Doctors need to understand AI decisions, not just trust them blindly
+- Patients often have multiple cardiac conditions simultaneously
+- Real-time predictions with comprehensive visual explanations
+- Professional dashboard ready for clinical demonstration
 
 ---
 
-## 🏥 Diagnostic Classes
+## Key Features
 
-| Class       | Condition              | Description                              | Prevalence |
-| ----------- | ---------------------- | ---------------------------------------- | ---------- |
-| ✅ **NORM** | Normal                 | No significant cardiac abnormalities     | 43.3%      |
-| 💔 **MI**   | Myocardial Infarction  | Signs of heart attack or ischemic damage | 19.0%      |
-| 📉 **STTC** | ST/T Change            | Abnormalities in ST segment or T wave    | 23.3%      |
-| ⚡ **CD**   | Conduction Disturbance | Abnormal electrical conduction patterns  | 22.5%      |
-| 💪 **HYP**  | Hypertrophy            | Signs of enlarged heart chambers         | 10.4%      |
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     12-Lead ECG Input                           │
-│                  (12 leads × 1000 samples @ 100Hz)              │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 Preprocessing Pipeline                          │
-│         Bandpass Filter (0.5-40 Hz) + Z-Normalization          │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Lead-wise ResBlock1D Encoder                       │
-│                 [32 → 64 → 128] channels                        │
-│                    with skip connections                        │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 Temporal Attention Block                        │
-│            Learns which time points are important               │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   Lead Attention Block                          │
-│          Learns which leads contribute most                     │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Multi-Label Classification Head                    │
-│             [128 → 64 → 5] with Sigmoid output                  │
-│            Outputs: NORM, MI, STTC, CD, HYP                     │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Model Statistics:**
-
-- **Parameters**: 276,421 (1.1 MB)
-- **Inference Time**: ~10ms on CPU, ~2ms on GPU
-- **Input**: 12-lead ECG (12 × 1000 samples)
-- **Output**: 5-class multi-label probabilities
+| Feature                            | Description                                                  |
+| ---------------------------------- | ------------------------------------------------------------ |
+| **Multi-Label Classification**     | Detect 5 cardiac conditions simultaneously from a single ECG |
+| **Attention-Based Explainability** | See which ECG segments and leads drove the prediction        |
+| **Professional Dashboard**         | Interactive Streamlit app with dark cardiac theme            |
+| **High Performance**               | 92.1% Validation AUROC, 91.2% Test AUROC                     |
+| **Fast Inference**                 | Real-time predictions (~10ms per ECG)                        |
 
 ---
 
-## 📊 Results
+## Diagnostic Classes
 
-### Performance Metrics
+| Class    | Condition              | Description                           | Prevalence |
+| -------- | ---------------------- | ------------------------------------- | ---------- |
+| **NORM** | Normal                 | No significant cardiac abnormalities  | 43.3%      |
+| **MI**   | Myocardial Infarction  | Heart attack or ischemic damage       | 19.0%      |
+| **STTC** | ST/T Change            | Abnormalities in ST segment or T wave | 23.3%      |
+| **CD**   | Conduction Disturbance | Abnormal electrical conduction        | 22.5%      |
+| **HYP**  | Hypertrophy            | Enlarged heart chambers               | 10.4%      |
+
+### Class Distribution
+
+<p align="center">
+  <img src="figures/01_class_distribution.png" alt="Class Distribution" width="700"/>
+</p>
+
+### Label Co-occurrence
+
+Patients often have multiple conditions. This heatmap shows how frequently conditions occur together:
+
+<p align="center">
+  <img src="figures/02_co_occurrence.png" alt="Co-occurrence Matrix" width="600"/>
+</p>
+
+---
+
+## Architecture
+
+TrustECG uses a custom neural network called **ExplainableECGNet** with 276,421 parameters:
+
+<p align="center">
+  <img src="figures/High-level-architecture-diagram.png" alt="Architecture Diagram" width="800"/>
+</p>
+
+**Pipeline:**
+
+1. **Input**: 12-lead ECG (12 × 1000 samples at 100 Hz)
+2. **Preprocessing**: Bandpass filter (0.5-40 Hz) + Z-score normalization
+3. **Encoder**: Lead-wise ResBlocks [32 → 64 → 128 channels]
+4. **Temporal Attention**: Learn important time points
+5. **Lead Attention**: Learn important leads
+6. **Output**: 5-class probabilities via sigmoid
+
+### Sample 12-Lead ECG
+
+<p align="center">
+  <img src="figures/03_sample_12lead_ecg.png" alt="Sample ECG" width="800"/>
+</p>
+
+---
+
+## Results
+
+### Overall Performance
 
 | Metric               | Validation | Test  |
 | -------------------- | ---------- | ----- |
 | **AUROC (Macro)**    | 92.1%      | 91.2% |
 | **F1-Score (Macro)** | 69.4%      | 69.4% |
 
-### Per-Class Test AUROC
+### Per-Class AUROC
+
+<p align="center">
+  <img src="figures/04_auroc_per_class.png" alt="AUROC Per Class" width="700"/>
+</p>
 
 | NORM  | MI    | STTC  | CD    | HYP   |
 | ----- | ----- | ----- | ----- | ----- |
 | 93.5% | 93.9% | 93.5% | 91.0% | 84.9% |
 
-### Training Details
+### Training Curves
 
-- **Epochs**: 10 (early stopping at epoch 9)
-- **Optimizer**: AdamW (lr=1e-3, weight_decay=0.01)
-- **Scheduler**: ReduceLROnPlateau
-- **Loss**: BCEWithLogitsLoss with sqrt-scaled class weights
-- **Hardware**: NVIDIA GeForce RTX 2050
+<p align="center">
+  <img src="figures/05_training_curves.png" alt="Training Curves" width="700"/>
+</p>
+
+### ROC Curves
+
+<p align="center">
+  <img src="figures/06_roc_curves.png" alt="ROC Curves" width="700"/>
+</p>
+
+### Confusion Matrices
+
+<p align="center">
+  <img src="figures/07_confusion_matrices.png" alt="Confusion Matrices" width="800"/>
+</p>
 
 ---
 
-## 🚀 Installation
+## Explainability
+
+What makes TrustECG different from a black box: we can visualize exactly what the model focuses on.
+
+### Lead Importance
+
+The radar chart shows which ECG leads contributed most to each prediction:
+
+<p align="center">
+  <img src="figures/08_lead_importance.png" alt="Lead Importance" width="600"/>
+</p>
+
+### Explainability Methods
+
+| Method                    | What It Shows                                             |
+| ------------------------- | --------------------------------------------------------- |
+| **Temporal Attention**    | Which time points are important (QRS, ST segment, T wave) |
+| **Lead Attention**        | Which of the 12 leads contributed most                    |
+| **Occlusion Sensitivity** | How prediction changes when each lead is masked           |
+| **Attention Heatmap**     | Combined view across all leads and time                   |
+
+---
+
+## Demo
+
+### Streamlit Dashboard
+
+The dashboard has three pages:
+
+| Page               | Description                                       |
+| ------------------ | ------------------------------------------------- |
+| **Dashboard**      | Project overview, metrics, feature highlights     |
+| **Analyze ECG**    | Load ECGs by ID, view predictions with confidence |
+| **Explainability** | Attention maps, lead radar, occlusion analysis    |
+
+---
+
+## Installation
 
 ### Prerequisites
 
 - Python 3.10+
-- CUDA 11.8+ (optional, for GPU acceleration)
+- CUDA 11.8+ (optional, for GPU)
 
 ### Quick Install
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/trustecg.git
-cd trustecg
+# Clone repository
+git clone https://github.com/yourusername/TrustECG.git
+cd TrustECG
 
-# Create virtual environment (using uv - recommended)
-uv venv
-source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate     # Windows
+# Create virtual environment
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Linux/Mac
 
 # Install dependencies
-uv sync
-
-# Or with pip
 pip install -e .
-```
-
-### Download PTB-XL Dataset
-
-The PTB-XL dataset is already included in the `dataset/` directory. If you need to re-download:
-
-```bash
-# Download from PhysioNet (requires ~2GB)
-wget -r -N -c -np https://physionet.org/files/ptb-xl/1.0.3/
 ```
 
 ---
 
-## 💻 Usage
+## Usage
 
-### Run the Streamlit Dashboard
+### Run the Dashboard
 
 ```bash
 streamlit run src/app/streamlit_app.py
 ```
 
-The dashboard opens at `http://localhost:8501` with three pages:
+Opens at `http://localhost:8501`
 
-| Page                  | Description                                         |
-| --------------------- | --------------------------------------------------- |
-| 🏠 **Dashboard**      | Overview, metrics, and feature highlights           |
-| 🔮 **Analyze ECG**    | Load ECGs from PTB-XL dataset for prediction        |
-| 🔍 **Explainability** | Attention maps, lead importance, occlusion analysis |
+### Quick Start
 
-### Using the Analyze Page
+1. Click **"Load Model"** in the sidebar
+2. Enter an ECG ID (1-21800)
+3. Click **"Load ECG"** to see predictions
+4. Go to **Explainability** page for visualizations
 
-1. **Load Model**: Click "🚀 Load Model" in the sidebar
-2. **Enter ECG ID**: Input a number from 1-21800 (patient record ID)
-3. **Load ECG**: Click "📥 Load ECG" to load and preprocess the signal
-4. **View Results**: See predictions with confidence scores and explanations
-
-**Example ECG IDs to try:**
+**Example ECG IDs:**
 
 - `9` - Normal ECG
 - `42` - Various conditions
@@ -200,8 +221,8 @@ The dashboard opens at `http://localhost:8501` with three pages:
 
 ```python
 import torch
-import numpy as np
 from src.app.streamlit_app import ExplainableECGNet, ECGPreprocessor
+import wfdb
 
 # Load model
 model = ExplainableECGNet()
@@ -209,21 +230,19 @@ state_dict = torch.load("checkpoints/trustecg_model.pt", map_location="cpu")
 model.load_state_dict(state_dict)
 model.eval()
 
-# Load and preprocess ECG
-import wfdb
+# Load ECG
 record = wfdb.rdrecord("dataset/records100/00000/00009_lr")
 signal = record.p_signal.T  # (12, 1000)
 
+# Preprocess and predict
 preprocessor = ECGPreprocessor()
-signal = preprocessor(signal)
+x = torch.from_numpy(preprocessor(signal)[None, ...])
 
-# Predict
-x = torch.from_numpy(signal[np.newaxis, ...])
 with torch.no_grad():
     output = model(x, return_attention=True)
     probs = output["probs"].numpy().squeeze()
 
-# Results
+# Print results
 classes = ["NORM", "MI", "STTC", "CD", "HYP"]
 for cls, prob in zip(classes, probs):
     print(f"{cls}: {prob:.1%}")
@@ -231,125 +250,75 @@ for cls, prob in zip(classes, probs):
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 TrustECG/
-├── .streamlit/
-│   └── config.toml          # Streamlit theme configuration
 ├── src/
 │   ├── app/
-│   │   └── streamlit_app.py # Main Streamlit dashboard
+│   │   └── streamlit_app.py     # Streamlit dashboard
 │   ├── data/
-│   │   ├── datamodule.py    # PyTorch Lightning DataModule
-│   │   ├── dataset.py       # ECG Dataset class
-│   │   └── preprocessing.py # Signal preprocessing
+│   │   ├── datamodule.py        # Lightning DataModule
+│   │   ├── dataset.py           # ECG Dataset
+│   │   └── preprocessing.py     # Signal preprocessing
 │   ├── models/
-│   │   ├── ecg_net.py       # ExplainableECGNet architecture
-│   │   ├── attention.py     # Attention mechanisms
-│   │   └── blocks.py        # Residual blocks
+│   │   ├── ecg_net.py           # ExplainableECGNet
+│   │   ├── attention.py         # Attention mechanisms
+│   │   └── blocks.py            # Residual blocks
 │   ├── training/
-│   │   ├── trainer.py       # Training script
-│   │   ├── callbacks.py     # Custom callbacks
-│   │   └── metrics.py       # Evaluation metrics
-│   ├── explainability/
-│   │   ├── attention_viz.py # Attention visualization
-│   │   ├── gradcam.py       # Grad-CAM implementation
-│   │   ├── lime_explainer.py
-│   │   └── shap_explainer.py
-│   └── feedback/
-│       ├── feedback_store.py     # Human feedback storage
-│       └── uncertainty_sampling.py
+│   │   ├── trainer.py           # Training script
+│   │   └── metrics.py           # Evaluation metrics
+│   └── explainability/
+│       ├── attention_viz.py     # Attention visualization
+│       ├── gradcam.py           # Grad-CAM
+│       └── lime_explainer.py    # LIME explainer
 ├── notebooks/
-│   ├── 01_eda.ipynb         # Exploratory data analysis
-│   └── 02_demo_colab.ipynb  # Google Colab demo
-├── checkpoints/
-│   └── trustecg_model.pt    # Trained model weights
-├── dataset/
-│   ├── ptbxl_database.csv   # Patient metadata
-│   ├── scp_statements.csv   # Diagnostic codes
-│   └── records100/          # 100Hz ECG recordings
-├── configs/
-│   └── default.yaml         # Training configuration
-├── figures/                 # Generated visualizations
-├── pyproject.toml          # Project dependencies
-└── README.md               # This file
+│   └── TrustECG_Complete.ipynb  # Full pipeline notebook
+├── checkpoints/                  # Trained model weights
+├── dataset/                      # PTB-XL dataset
+├── figures/                      # Visualizations
+├── reports/                      # Project documentation
+│   ├── TrustECG Report.pdf      # Detailed report
+│   └── TrustECG Report.docx
+├── docs/
+│   └── ARCHITECTURE.md          # Technical architecture
+└── pyproject.toml               # Dependencies
 ```
 
 ---
 
-## 🧪 Explainability Methods
+## Documentation
 
-### 1. Temporal Attention
-
-Shows which **time points** in the ECG are most important for classification.
-
-### 2. Lead Attention
-
-Visualizes which of the **12 ECG leads** contribute most to the prediction.
-
-### 3. Occlusion Sensitivity
-
-Measures prediction change when each lead is **masked to zero**, indicating its importance.
-
-### 4. Attention Heatmap
-
-Combined view of temporal attention across all leads for pattern identification.
+- **[Project Report](reports/TrustECG%20Report.pdf)** - Comprehensive documentation of methodology, results, and findings
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - Technical details of model architecture
+- **[Complete Notebook](notebooks/TrustECG_Complete.ipynb)** - Full training and evaluation pipeline
 
 ---
 
-## 🔧 Configuration
+## Technical Specifications
 
-### Streamlit Theme (`.streamlit/config.toml`)
-
-```toml
-[theme]
-primaryColor = "#E63946"           # Heart red accent
-backgroundColor = "#0F1419"         # Dark background
-secondaryBackgroundColor = "#1A1F26"
-textColor = "#F8F9FA"
-```
-
-### Training Configuration (`configs/default.yaml`)
-
-```yaml
-model:
-  encoder_channels: [32, 64, 128]
-  dropout: 0.3
-
-training:
-  epochs: 20
-  lr: 0.001
-  batch_size: 64
-  weight_decay: 0.01
-```
+| Component      | Specification                 |
+| -------------- | ----------------------------- |
+| Model          | ExplainableECGNet             |
+| Parameters     | 276,421                       |
+| Input Shape    | 12 × 1000 samples             |
+| Output         | 5 class probabilities         |
+| Framework      | PyTorch 2.6.0 + Lightning 2.5 |
+| Training Time  | ~10 minutes on RTX 2050       |
+| Inference Time | ~10ms per ECG                 |
 
 ---
 
-## 📚 References
+## References
 
-- **PTB-XL Dataset**: Wagner, P., et al. "PTB-XL, a large publicly available electrocardiography dataset." _Scientific Data_ 7.1 (2020): 1-15.
-- **Attention Mechanisms**: Vaswani, A., et al. "Attention is all you need." _NeurIPS_ 2017.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [PTB-XL Dataset](https://physionet.org/content/ptb-xl/) by PhysioNet
-- [PyTorch](https://pytorch.org/) and [PyTorch Lightning](https://lightning.ai/)
-- [Streamlit](https://streamlit.io/) for the dashboard framework
-- [Plotly](https://plotly.com/) for interactive visualizations
+1. Wagner, P., et al. "PTB-XL, a large publicly available electrocardiography dataset." _Scientific Data_ 7.1 (2020): 1-15.
+2. Vaswani, A., et al. "Attention is all you need." _NeurIPS_ 2017.
+3. He, K., et al. "Deep residual learning for image recognition." _CVPR_ 2016.
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by the TrustECG Team**
+**TrustECG** - Because healthcare AI should show its work.
 
 </div>
