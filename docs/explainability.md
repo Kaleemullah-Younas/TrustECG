@@ -6,18 +6,18 @@ How TrustECG provides interpretable predictions through attention mechanisms and
 
 ## Why Explainability Matters
 
-In healthcare AI, a prediction alone isn't enough. Doctors need to understand *why* the model flagged something. TrustECG builds explainability directly into the architecture (not as a post-hoc add-on), using attention mechanisms that learn which parts of the ECG matter most.
+In healthcare AI, a prediction alone isn't enough. Doctors need to understand _why_ the model flagged something. TrustECG builds explainability directly into the architecture (not as a post-hoc add-on), using attention mechanisms that learn which parts of the ECG matter most.
 
 ---
 
 ## Explainability Methods
 
-| Method | Level | What It Shows | Computation |
-|--------|-------|---------------|-------------|
-| **Lead Attention** | Per-lead | Which of 12 leads contributed most | Built-in (free) |
-| **Temporal Attention** | Per-timestep | Which time segments matter per lead | Built-in (free) |
-| **Occlusion Sensitivity** | Per-lead per-class | Impact of masking each lead | 12 forward passes |
-| **Attention Heatmap** | Combined | 2D view of attention across leads × time | Built-in (free) |
+| Method                    | Level              | What It Shows                            | Computation       |
+| ------------------------- | ------------------ | ---------------------------------------- | ----------------- |
+| **Lead Attention**        | Per-lead           | Which of 12 leads contributed most       | Built-in (free)   |
+| **Temporal Attention**    | Per-timestep       | Which time segments matter per lead      | Built-in (free)   |
+| **Occlusion Sensitivity** | Per-lead per-class | Impact of masking each lead              | 12 forward passes |
+| **Attention Heatmap**     | Combined           | 2D view of attention across leads × time | Built-in (free)   |
 
 ---
 
@@ -52,13 +52,13 @@ fig = go.Figure(go.Scatterpolar(
 
 The learned attention patterns align with cardiology knowledge:
 
-| Condition | Expected Important Leads | Why |
-|-----------|-------------------------|-----|
-| Inferior MI | II, III, aVF | These leads view the inferior wall |
-| Anterior MI | V1-V4 | These leads view the anterior wall |
-| Lateral MI | I, aVL, V5, V6 | These leads view the lateral wall |
-| HYP | V1-V6 (chest leads) | Voltage criteria measured in chest leads |
-| CD | II (rhythm lead) | Lead II best shows P waves and rhythm |
+| Condition   | Expected Important Leads | Why                                      |
+| ----------- | ------------------------ | ---------------------------------------- |
+| Inferior MI | II, III, aVF             | These leads view the inferior wall       |
+| Anterior MI | V1-V4                    | These leads view the anterior wall       |
+| Lateral MI  | I, aVL, V5, V6           | These leads view the lateral wall        |
+| HYP         | V1-V6 (chest leads)      | Voltage criteria measured in chest leads |
+| CD          | II (rhythm lead)         | Lead II best shows P waves and rhythm    |
 
 ---
 
@@ -72,12 +72,12 @@ $$\alpha_t = \text{softmax}\left(\text{score}(h_t)\right) \quad \text{for } t \i
 
 In a typical ECG, the model learns to attend to:
 
-| ECG Feature | Approximate Time | Clinical Significance |
-|-------------|------------------|----------------------|
-| **QRS complex** | ~0.06-0.12s per beat | Ventricular depolarization, conduction |
-| **ST segment** | ~0.12-0.20s after QRS | Ischemia, MI detection |
-| **T wave** | ~0.20-0.40s after QRS | Repolarization abnormalities |
-| **P wave** | ~0.08-0.12s before QRS | Atrial activity, hypertrophy |
+| ECG Feature     | Approximate Time       | Clinical Significance                  |
+| --------------- | ---------------------- | -------------------------------------- |
+| **QRS complex** | ~0.06-0.12s per beat   | Ventricular depolarization, conduction |
+| **ST segment**  | ~0.12-0.20s after QRS  | Ischemia, MI detection                 |
+| **T wave**      | ~0.20-0.40s after QRS  | Repolarization abnormalities           |
+| **P wave**      | ~0.08-0.12s before QRS | Atrial activity, hypertrophy           |
 
 ### Visualization: Heatmap
 
@@ -121,19 +121,19 @@ for i in range(12):
 
 ### Interpretation
 
-| Importance Value | Meaning |
-|-----------------|---------|
-| 0.0 | Masking this lead had no effect (not important) |
-| 0.01-0.05 | Minor contribution |
-| 0.05-0.15 | Moderate contribution |
-| > 0.15 | Critical lead for this prediction |
+| Importance Value | Meaning                                         |
+| ---------------- | ----------------------------------------------- |
+| 0.0              | Masking this lead had no effect (not important) |
+| 0.01-0.05        | Minor contribution                              |
+| 0.05-0.15        | Moderate contribution                           |
+| > 0.15           | Critical lead for this prediction               |
 
 ### Advantages Over Attention
 
 Occlusion analysis provides a different perspective than attention weights:
 
-- **Attention** shows what the model *looked at*
-- **Occlusion** shows what the model *needs* (removing it changes the answer)
+- **Attention** shows what the model _looked at_
+- **Occlusion** shows what the model _needs_ (removing it changes the answer)
 
 These often agree but can differ. If a lead has high attention but low occlusion importance, the model looked at it but could reach the same conclusion without it.
 

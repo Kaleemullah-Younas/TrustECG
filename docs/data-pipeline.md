@@ -8,27 +8,27 @@ How TrustECG loads, processes, and prepares ECG data for training and inference.
 
 [PTB-XL](https://physionet.org/content/ptb-xl/) is the largest publicly available clinical ECG dataset.
 
-| Property | Value |
-|----------|-------|
-| Total records | 21,801 |
-| Format | 12-lead ECG |
-| Duration | 10 seconds per recording |
-| Sampling rates | 100 Hz and 500 Hz |
-| Annotations | Cardiologist-verified SCP codes |
-| Source | University Hospital, Germany |
+| Property       | Value                           |
+| -------------- | ------------------------------- |
+| Total records  | 21,801                          |
+| Format         | 12-lead ECG                     |
+| Duration       | 10 seconds per recording        |
+| Sampling rates | 100 Hz and 500 Hz               |
+| Annotations    | Cardiologist-verified SCP codes |
+| Source         | University Hospital, Germany    |
 
 ### Metadata Files
 
 **`ptbxl_database.csv`** contains one row per ECG:
 
-| Column | Description |
-|--------|-------------|
-| `ecg_id` | Unique record identifier (1-21799) |
-| `filename_lr` | Path to 100 Hz recording |
-| `filename_hr` | Path to 500 Hz recording |
-| `scp_codes` | Dict of SCP diagnostic codes with likelihoods |
-| `strat_fold` | Pre-assigned stratification fold (1-10) |
-| `age`, `sex` | Patient demographics |
+| Column        | Description                                   |
+| ------------- | --------------------------------------------- |
+| `ecg_id`      | Unique record identifier (1-21799)            |
+| `filename_lr` | Path to 100 Hz recording                      |
+| `filename_hr` | Path to 500 Hz recording                      |
+| `scp_codes`   | Dict of SCP diagnostic codes with likelihoods |
+| `strat_fold`  | Pre-assigned stratification fold (1-10)       |
+| `age`, `sex`  | Patient demographics                          |
 
 **`scp_statements.csv`** maps SCP codes to diagnostic superclasses:
 
@@ -67,13 +67,13 @@ Result: each record gets a list like `["NORM"]` or `["MI", "STTC"]`.
 
 ### Class Distribution
 
-| Class | Count | Prevalence | Description |
-|-------|-------|------------|-------------|
-| NORM | 9,438 | 43.3% | Normal |
-| MI | 4,134 | 19.0% | Myocardial Infarction |
-| STTC | 5,078 | 23.3% | ST/T Change |
-| CD | 4,891 | 22.5% | Conduction Disturbance |
-| HYP | 2,258 | 10.4% | Hypertrophy |
+| Class | Count | Prevalence | Description            |
+| ----- | ----- | ---------- | ---------------------- |
+| NORM  | 9,438 | 43.3%      | Normal                 |
+| MI    | 4,134 | 19.0%      | Myocardial Infarction  |
+| STTC  | 5,078 | 23.3%      | ST/T Change            |
+| CD    | 4,891 | 22.5%      | Conduction Disturbance |
+| HYP   | 2,258 | 10.4%      | Hypertrophy            |
 
 Note: percentages sum to >100% because records can have multiple labels (~27% are multi-label).
 
@@ -91,11 +91,11 @@ Note: percentages sum to >100% because records can have multiple labels (~27% ar
 
 We use PTB-XL's pre-defined stratification folds to prevent patient leakage:
 
-| Split | Folds | Records | Percentage |
-|-------|-------|---------|------------|
-| Train | 1-8 | 17,441 | ~80% |
-| Validation | 9 | 2,203 | ~10% |
-| Test | 10 | 2,157 | ~10% |
+| Split      | Folds | Records | Percentage |
+| ---------- | ----- | ------- | ---------- |
+| Train      | 1-8   | 17,441  | ~80%       |
+| Validation | 9     | 2,203   | ~10%       |
+| Test       | 10    | 2,157   | ~10%       |
 
 ```python
 train_mask = Y.strat_fold.isin(range(1, 9))
@@ -104,6 +104,7 @@ test_mask  = Y.strat_fold == 10
 ```
 
 This ensures:
+
 - No patient appears in multiple splits
 - Class distribution is preserved across splits
 - Results are reproducible (same split as the original PTB-XL paper)
@@ -125,9 +126,11 @@ signal = signal.T          # Transpose to (12, 1000) — leads × time
 ```
 
 **File naming convention:**
+
 ```
 dataset/records100/{folder:05d}/{ecg_id:05d}_lr.hea
 ```
+
 Where `folder = (ecg_id - 1) // 1000 * 1000`
 
 Example: ECG ID `9` → `dataset/records100/00000/00009_lr`
@@ -141,6 +144,7 @@ The `ECGPreprocessor` class applies two steps:
 ### Step 1: Bandpass Filter (0.5–40 Hz)
 
 Removes noise outside the clinically relevant frequency range:
+
 - **Below 0.5 Hz**: Baseline wander from breathing and movement
 - **Above 40 Hz**: High-frequency noise, muscle artifacts, power line interference
 

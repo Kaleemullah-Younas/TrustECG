@@ -6,11 +6,11 @@ This guide walks you through installing TrustECG, running the dashboard, and mak
 
 ## Prerequisites
 
-| Requirement | Version |
-|-------------|---------|
-| Python | 3.10 or higher |
-| pip / uv | Latest |
-| Git | Any recent version |
+| Requirement    | Version                         |
+| -------------- | ------------------------------- |
+| Python         | 3.10 or higher                  |
+| pip / uv       | Latest                          |
+| Git            | Any recent version              |
 | GPU (optional) | CUDA 11.8+ for faster inference |
 
 ---
@@ -27,6 +27,7 @@ cd TrustECG
 ### 2. Create a Virtual Environment
 
 **Using uv (recommended):**
+
 ```bash
 uv venv
 .venv\Scripts\activate     # Windows
@@ -34,6 +35,7 @@ source .venv/bin/activate   # Linux / macOS
 ```
 
 **Using standard venv:**
+
 ```bash
 python -m venv .venv
 .venv\Scripts\activate     # Windows
@@ -51,6 +53,7 @@ pip install -e .
 ```
 
 This installs all dependencies defined in `pyproject.toml`:
+
 - **Core ML**: PyTorch, PyTorch Lightning, torchmetrics
 - **Data**: NumPy, Pandas, SciPy, wfdb, scikit-learn
 - **Explainability**: SHAP, LIME, Captum
@@ -75,6 +78,7 @@ wget -r -N -c -np https://physionet.org/files/ptb-xl/1.0.3/
 ```
 
 **Required files:**
+
 ```
 dataset/
 ├── ptbxl_database.csv      # Patient metadata and labels
@@ -105,12 +109,12 @@ Opens at **http://localhost:8501**
 
 ### Useful ECG IDs to Try
 
-| ECG ID | Expected Result |
-|--------|----------------|
-| `9` | Normal ECG |
-| `42` | Mixed conditions |
-| `100` | Multi-label example |
-| `500` | Try different patterns |
+| ECG ID | Expected Result        |
+| ------ | ---------------------- |
+| `9`    | Normal ECG             |
+| `42`   | Mixed conditions       |
+| `100`  | Multi-label example    |
+| `500`  | Try different patterns |
 
 ---
 
@@ -156,23 +160,23 @@ temporal_attention = output["temporal_attention"] # Shape: (1, 12, 125)
 
 ## Model Checkpoints
 
-| File | Description |
-|------|-------------|
+| File                            | Description                                      |
+| ------------------------------- | ------------------------------------------------ |
 | `checkpoints/trustecg_model.pt` | Trained model state dict (best validation AUROC) |
-| `checkpoints/model_config.json` | Model hyperparameters and training metadata |
-| `notebooks/best_model.pt` | Same weights saved from training notebook |
+| `checkpoints/model_config.json` | Model hyperparameters and training metadata      |
+| `notebooks/best_model.pt`       | Same weights saved from training notebook        |
 
 ---
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| `ModuleNotFoundError: wfdb` | Run `pip install wfdb` |
-| Model loads as "untrained" | Check that `checkpoints/trustecg_model.pt` exists |
-| ECG loading fails | Verify `dataset/records100/` directory exists |
-| CUDA out of memory | Model is small (276K params), this is unlikely. Try `map_location="cpu"` |
-| Streamlit not found | Run `pip install streamlit` |
+| Problem                     | Solution                                                                 |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `ModuleNotFoundError: wfdb` | Run `pip install wfdb`                                                   |
+| Model loads as "untrained"  | Check that `checkpoints/trustecg_model.pt` exists                        |
+| ECG loading fails           | Verify `dataset/records100/` directory exists                            |
+| CUDA out of memory          | Model is small (276K params), this is unlikely. Try `map_location="cpu"` |
+| Streamlit not found         | Run `pip install streamlit`                                              |
 
 ---
 

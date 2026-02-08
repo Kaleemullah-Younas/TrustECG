@@ -8,11 +8,11 @@ Complete technical breakdown of ExplainableECGNet, the neural network at the hea
 
 ExplainableECGNet is a CNN + Attention hybrid designed for multi-label ECG classification with built-in interpretability.
 
-| Property | Value |
-|----------|-------|
-| Parameters | 276,421 |
-| Input | (batch, 12, 1000) — 12 leads × 1000 time steps |
-| Output | 5 probabilities (one per diagnostic class) |
+| Property          | Value                                           |
+| ----------------- | ----------------------------------------------- |
+| Parameters        | 276,421                                         |
+| Input             | (batch, 12, 1000) — 12 leads × 1000 time steps  |
+| Output            | 5 probabilities (one per diagnostic class)      |
 | Attention outputs | Temporal weights (12, 125) + Lead weights (12,) |
 
 <p align="center">
@@ -75,13 +75,13 @@ Input ──→ Conv1d → BN → ReLU → Dropout → Conv1d → BN ──→ (
 
 **Parameters:**
 
-| Property | Value |
-|----------|-------|
-| Kernel size | 7 |
-| Stride | 2 (halves temporal dimension) |
-| Dropout | 0.1 within blocks |
-| Activation | ReLU |
-| Normalization | BatchNorm1d |
+| Property      | Value                         |
+| ------------- | ----------------------------- |
+| Kernel size   | 7                             |
+| Stride        | 2 (halves temporal dimension) |
+| Dropout       | 0.1 within blocks             |
+| Activation    | ReLU                          |
+| Normalization | BatchNorm1d                   |
 
 **Skip connection**: Uses a 1×1 convolution + BatchNorm when input and output dimensions differ (channel count or temporal length).
 
@@ -90,10 +90,10 @@ class ResidualBlock1D(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=7, stride=1, dropout=0.1):
         super().__init__()
         padding = kernel_size // 2
-        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, 
+        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size,
                                stride=stride, padding=padding)
         self.bn1 = nn.BatchNorm1d(out_channels)
-        self.conv2 = nn.Conv1d(out_channels, out_channels, kernel_size, 
+        self.conv2 = nn.Conv1d(out_channels, out_channels, kernel_size,
                                stride=1, padding=padding)
         self.bn2 = nn.BatchNorm1d(out_channels)
         self.dropout = nn.Dropout(dropout)
@@ -108,11 +108,11 @@ class ResidualBlock1D(nn.Module):
 
 **Three blocks in sequence:**
 
-| Block | Input | Output | Temporal dim |
-|-------|-------|--------|-------------|
-| Block 1 | (1, 1000) | (32, 500) | 1000 → 500 |
-| Block 2 | (32, 500) | (64, 250) | 500 → 250 |
-| Block 3 | (64, 250) | (128, 125) | 250 → 125 |
+| Block   | Input     | Output     | Temporal dim |
+| ------- | --------- | ---------- | ------------ |
+| Block 1 | (1, 1000) | (32, 500)  | 1000 → 500   |
+| Block 2 | (32, 500) | (64, 250)  | 500 → 250    |
+| Block 3 | (64, 250) | (128, 125) | 250 → 125    |
 
 ### 2. Temporal Attention
 
@@ -236,13 +236,13 @@ def forward(self, x, return_attention=False):
 
 ## Design Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| **Lead-wise encoding** | Each lead has the same structure (PQRST waves). Processing independently lets the model learn lead-specific features before comparing across leads. |
-| **Shared encoder** | All 12 leads pass through the same CNN. Reduces parameters and enforces consistent feature extraction. |
-| **Dual attention** | Temporal attention finds important time points (QRS, ST segments). Lead attention finds important leads. Together they provide two levels of interpretability. |
-| **Sigmoid over softmax** | Multi-label: conditions are independent. A patient can have MI + STTC at the same time. |
-| **Small model (276K)** | Deliberately compact for fast inference and deployment on consumer hardware. |
+| Decision                 | Rationale                                                                                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Lead-wise encoding**   | Each lead has the same structure (PQRST waves). Processing independently lets the model learn lead-specific features before comparing across leads.            |
+| **Shared encoder**       | All 12 leads pass through the same CNN. Reduces parameters and enforces consistent feature extraction.                                                         |
+| **Dual attention**       | Temporal attention finds important time points (QRS, ST segments). Lead attention finds important leads. Together they provide two levels of interpretability. |
+| **Sigmoid over softmax** | Multi-label: conditions are independent. A patient can have MI + STTC at the same time.                                                                        |
+| **Small model (276K)**   | Deliberately compact for fast inference and deployment on consumer hardware.                                                                                   |
 
 ---
 
@@ -250,16 +250,16 @@ def forward(self, x, return_attention=False):
 
 For a single sample flowing through the network:
 
-| Stage | Shape | Description |
-|-------|-------|-------------|
-| Input | (1, 12, 1000) | batch, leads, time |
-| After reshape | (12, 1, 1000) | leads as batch, channel, time |
-| After encoder | (12, 128, 125) | leads, features, compressed time |
-| After reshape | (1, 12, 125, 128) | batch, leads, time, features |
-| Per-lead temporal attn | (1, 128) per lead | weighted feature per lead |
-| Stacked lead features | (1, 12, 128) | all lead features |
-| After lead attn | (1, 128) | global context vector |
-| Classifier output | (1, 5) | class probabilities |
+| Stage                  | Shape             | Description                      |
+| ---------------------- | ----------------- | -------------------------------- |
+| Input                  | (1, 12, 1000)     | batch, leads, time               |
+| After reshape          | (12, 1, 1000)     | leads as batch, channel, time    |
+| After encoder          | (12, 128, 125)    | leads, features, compressed time |
+| After reshape          | (1, 12, 125, 128) | batch, leads, time, features     |
+| Per-lead temporal attn | (1, 128) per lead | weighted feature per lead        |
+| Stacked lead features  | (1, 12, 128)      | all lead features                |
+| After lead attn        | (1, 128)          | global context vector            |
+| Classifier output      | (1, 5)            | class probabilities              |
 
 ---
 

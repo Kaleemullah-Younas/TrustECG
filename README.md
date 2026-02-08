@@ -288,18 +288,18 @@ TrustECG/
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Documentation Home](docs/index.md) | Table of contents and project overview |
-| [Getting Started](docs/getting-started.md) | Installation, setup, and first prediction |
-| [Data Pipeline](docs/data-pipeline.md) | PTB-XL dataset, preprocessing, train/val/test splits |
-| [Model Architecture](docs/architecture.md) | ExplainableECGNet design, tensor shapes, and design decisions |
-| [Training Guide](docs/training.md) | Loss function, class weighting, evaluation metrics |
-| [Explainability](docs/explainability.md) | Attention visualization, occlusion analysis, clinical validation |
-| [Dashboard Guide](docs/dashboard.md) | Streamlit app pages, customization, deployment |
-| [API Reference](docs/api-reference.md) | Complete class and function documentation |
-| [Project Report](reports/TrustECG%20Report.pdf) | Full methodology, results, and findings |
-| [Training Notebook](notebooks/TrustECG_Notebook.ipynb) | End-to-end training and evaluation pipeline |
+| Document                                               | Description                                                      |
+| ------------------------------------------------------ | ---------------------------------------------------------------- |
+| [Documentation Home](docs/index.md)                    | Table of contents and project overview                           |
+| [Getting Started](docs/getting-started.md)             | Installation, setup, and first prediction                        |
+| [Data Pipeline](docs/data-pipeline.md)                 | PTB-XL dataset, preprocessing, train/val/test splits             |
+| [Model Architecture](docs/architecture.md)             | ExplainableECGNet design, tensor shapes, and design decisions    |
+| [Training Guide](docs/training.md)                     | Loss function, class weighting, evaluation metrics               |
+| [Explainability](docs/explainability.md)               | Attention visualization, occlusion analysis, clinical validation |
+| [Dashboard Guide](docs/dashboard.md)                   | Streamlit app pages, customization, deployment                   |
+| [API Reference](docs/api-reference.md)                 | Complete class and function documentation                        |
+| [Project Report](reports/TrustECG%20Report.pdf)        | Full methodology, results, and findings                          |
+| [Training Notebook](notebooks/TrustECG_Notebook.ipynb) | End-to-end training and evaluation pipeline                      |
 
 ---
 

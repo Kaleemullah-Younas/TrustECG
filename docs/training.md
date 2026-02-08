@@ -8,16 +8,16 @@ How TrustECG is trained, including the loss function, class imbalance handling, 
 
 All training is done in the notebook: [`notebooks/TrustECG_Notebook.ipynb`](../notebooks/TrustECG_Notebook.ipynb)
 
-| Hyperparameter | Value |
-|----------------|-------|
-| Optimizer | AdamW |
-| Learning rate | 0.001 |
-| Weight decay | 0.01 |
-| Scheduler | ReduceLROnPlateau (patience=3, factor=0.5) |
-| Batch size | 64 |
-| Max epochs | 10 |
-| Early stopping | Patience=5 on validation AUROC |
-| Hardware | NVIDIA GeForce RTX 2050 |
+| Hyperparameter | Value                                      |
+| -------------- | ------------------------------------------ |
+| Optimizer      | AdamW                                      |
+| Learning rate  | 0.001                                      |
+| Weight decay   | 0.01                                       |
+| Scheduler      | ReduceLROnPlateau (patience=3, factor=0.5) |
+| Batch size     | 64                                         |
+| Max epochs     | 10                                         |
+| Early stopping | Patience=5 on validation AUROC             |
+| Hardware       | NVIDIA GeForce RTX 2050                    |
 
 ---
 
@@ -28,6 +28,7 @@ We use `BCEWithLogitsLoss` (binary cross-entropy with built-in sigmoid) for mult
 $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{5} \left[ w_c \cdot y_{ic} \log(\sigma(z_{ic})) + (1 - y_{ic}) \log(1 - \sigma(z_{ic})) \right]$$
 
 Where:
+
 - $y_{ic}$ is the ground truth (0 or 1) for sample $i$, class $c$
 - $z_{ic}$ is the raw logit output
 - $\sigma$ is the sigmoid function
@@ -43,11 +44,11 @@ The dataset is imbalanced (NORM is 43.3%, HYP is only 10.4%). We use `pos_weight
 
 We tried three approaches:
 
-| Strategy | Formula | Result |
-|----------|---------|--------|
-| No weighting | $w_c = 1$ | Model biased toward NORM, poor HYP detection |
-| Full inverse | $w_c = \frac{N_{\text{neg}}}{N_{\text{pos}}}$ | Overfitting to rare classes, unstable training |
-| **Square-root** | $w_c = \sqrt{\frac{N_{\text{neg}}}{N_{\text{pos}}}}$ | Best balance across all classes |
+| Strategy        | Formula                                              | Result                                         |
+| --------------- | ---------------------------------------------------- | ---------------------------------------------- |
+| No weighting    | $w_c = 1$                                            | Model biased toward NORM, poor HYP detection   |
+| Full inverse    | $w_c = \frac{N_{\text{neg}}}{N_{\text{pos}}}$        | Overfitting to rare classes, unstable training |
+| **Square-root** | $w_c = \sqrt{\frac{N_{\text{neg}}}{N_{\text{pos}}}}$ | Best balance across all classes                |
 
 ### Computed Weights
 
@@ -58,12 +59,12 @@ pos_weight = torch.sqrt(neg_counts / pos_counts)
 ```
 
 | Class | Positive | Negative | pos_weight |
-|-------|----------|----------|------------|
-| NORM | 7,549 | 9,892 | 1.14 |
-| MI | 3,307 | 14,134 | 2.07 |
-| STTC | 4,071 | 13,370 | 1.81 |
-| CD | 3,912 | 13,529 | 1.86 |
-| HYP | 1,796 | 15,645 | 2.95 |
+| ----- | -------- | -------- | ---------- |
+| NORM  | 7,549    | 9,892    | 1.14       |
+| MI    | 3,307    | 14,134   | 2.07       |
+| STTC  | 4,071    | 13,370   | 1.81       |
+| CD    | 3,912    | 13,529   | 1.86       |
+| HYP   | 1,796    | 15,645   | 2.95       |
 
 HYP gets ~3× the weight of NORM, balanced enough to improve detection without destabilizing training.
 
@@ -146,20 +147,20 @@ Computed using `sklearn.metrics.roc_auc_score` with `average=None` for per-class
 
 ### Overall
 
-| Metric | Validation | Test |
-|--------|------------|------|
-| **AUROC (Macro)** | 92.1% | 91.2% |
-| **F1-Score (Macro)** | 69.4% | 69.4% |
+| Metric               | Validation | Test  |
+| -------------------- | ---------- | ----- |
+| **AUROC (Macro)**    | 92.1%      | 91.2% |
+| **F1-Score (Macro)** | 69.4%      | 69.4% |
 
 ### Per-Class Test Performance
 
-| Class | AUROC | F1 |
-|-------|-------|-----|
-| NORM | 93.5% | 82.0% |
-| MI | 93.9% | 70.6% |
-| STTC | 93.5% | 66.6% |
-| CD | 91.0% | 71.2% |
-| HYP | 84.9% | 56.7% |
+| Class | AUROC | F1    |
+| ----- | ----- | ----- |
+| NORM  | 93.5% | 82.0% |
+| MI    | 93.9% | 70.6% |
+| STTC  | 93.5% | 66.6% |
+| CD    | 91.0% | 71.2% |
+| HYP   | 84.9% | 56.7% |
 
 <p align="center">
   <img src="../figures/04_auroc_per_class.png" alt="AUROC Per Class" width="600"/>
@@ -182,12 +183,15 @@ Computed using `sklearn.metrics.roc_auc_score` with `average=None` for per-class
 ## Observations
 
 **Strong performers (>93% AUROC):**
+
 - NORM, MI, STTC: These conditions have clear ECG patterns and sufficient training data
 
 **Weaker performer:**
+
 - HYP (84.9%): Rarest class (10.4%), subtler ECG patterns. Could benefit from per-class threshold optimization or additional features
 
 **F1 gap from AUROC:**
+
 - F1 scores are lower because we use a fixed threshold of 0.5. Per-class threshold optimization on the validation set could significantly improve F1
 
 ---

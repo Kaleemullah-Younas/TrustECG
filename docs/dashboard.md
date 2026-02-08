@@ -18,12 +18,12 @@ Opens at **http://localhost:8501**
 
 The dashboard uses a custom dark theme with cardiac-red accents:
 
-| Element | Color | Code |
-|---------|-------|------|
-| Primary accent | Cardiac red | `#E63946` |
-| Background | Deep dark | `#0F1419` |
+| Element        | Color            | Code      |
+| -------------- | ---------------- | --------- |
+| Primary accent | Cardiac red      | `#E63946` |
+| Background     | Deep dark        | `#0F1419` |
 | Cards / panels | Slightly lighter | `#1A1F26` |
-| Text | Clean white | `#F8F9FA` |
+| Text           | Clean white      | `#F8F9FA` |
 
 Configured in `.streamlit/config.toml`:
 
@@ -37,6 +37,7 @@ font = "sans serif"
 ```
 
 The app also injects custom CSS for:
+
 - Gradient hero header
 - Hover-animated metric cards
 - Styled alert boxes (success, warning, info)
@@ -52,6 +53,7 @@ The app also injects custom CSS for:
 The landing page provides a project overview.
 
 **Components:**
+
 - **Hero header**: Gradient banner with project name and tagline
 - **Metric cards**: Val AUROC (92.1%), Test AUROC (91.2%), Records (21,801), Parameters (276K)
 - **Feature cards**: Multi-label classification, Explainable AI, Clinical-grade data
@@ -63,12 +65,14 @@ The landing page provides a project overview.
 The main analysis page for loading and classifying ECGs.
 
 **Left panel** — Input:
+
 - ECG ID input (1-21800)
 - "Load ECG" button → loads from PTB-XL dataset
 - "Demo ECG" button → generates synthetic ECG
 - 12-lead ECG visualization (Plotly interactive chart)
 
 **Right panel** — Results:
+
 - Status alert (green for normal, red for abnormalities)
 - Prediction confidence bars (horizontal bar chart with 0.5 threshold line)
 - Condition details (expanded info for conditions > 30% probability)
@@ -78,6 +82,7 @@ The main analysis page for loading and classifying ECGs.
 Visualization of model attention and feature importance.
 
 **Components:**
+
 - **Lead importance radar**: Polar chart showing attention weight per lead
 - **Prediction confidence**: Bar chart (same as Analyze page)
 - **Temporal attention heatmap**: 12 × 125 heatmap showing attention across leads and time
@@ -89,13 +94,13 @@ Visualization of model attention and feature importance.
 
 The sidebar is persistent across all pages:
 
-| Element | Function |
-|---------|----------|
-| Logo + branding | TrustECG heart icon and name |
-| Navigation radio | Switch between 3 pages |
-| Model status | Load model button / ready indicator |
-| Dataset info | Record count and class count metrics |
-| Version | "TrustECG v1.0" |
+| Element          | Function                             |
+| ---------------- | ------------------------------------ |
+| Logo + branding  | TrustECG heart icon and name         |
+| Navigation radio | Switch between 3 pages               |
+| Model status     | Load model button / ready indicator  |
+| Dataset info     | Record count and class count metrics |
+| Version          | "TrustECG v1.0"                      |
 
 ---
 
@@ -103,13 +108,13 @@ The sidebar is persistent across all pages:
 
 The app uses `st.session_state` to persist data across interactions:
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `model` | `ExplainableECGNet` or `None` | Loaded model instance |
-| `predictions` | `np.ndarray` or `None` | Last prediction probabilities (5,) |
-| `current_ecg` | `np.ndarray` or `None` | Current ECG signal (12, 1000) |
-| `ecg_id` | `int` or `str` or `None` | Current ECG identifier |
-| `attention` | `dict` or `None` | Attention weights from last prediction |
+| Key           | Type                          | Description                            |
+| ------------- | ----------------------------- | -------------------------------------- |
+| `model`       | `ExplainableECGNet` or `None` | Loaded model instance                  |
+| `predictions` | `np.ndarray` or `None`        | Last prediction probabilities (5,)     |
+| `current_ecg` | `np.ndarray` or `None`        | Current ECG signal (12, 1000)          |
+| `ecg_id`      | `int` or `str` or `None`      | Current ECG identifier                 |
+| `attention`   | `dict` or `None`              | Attention weights from last prediction |
 
 ---
 
@@ -130,6 +135,7 @@ def load_ecg_by_id(ecg_id: int):
 ### Demo ECG (Synthetic)
 
 Generates a synthetic ECG with:
+
 - Gaussian QRS-like peaks at regular intervals
 - Random baseline noise
 - 12 leads with slight amplitude variation
@@ -192,15 +198,15 @@ backgroundColor = "#YOUR_BG"
 
 The CSS is embedded in `streamlit_app.py` inside the `st.markdown()` call at the top. Key classes:
 
-| CSS Class | Used For |
-|-----------|----------|
-| `.hero-header` | Top gradient banner |
-| `.metric-card` | Stats cards |
-| `.feature-card` | Feature description boxes |
-| `.success-alert` | Green notification boxes |
-| `.warning-alert` | Red notification boxes |
-| `.info-alert` | Blue notification boxes |
-| `.pred-row` | Prediction result rows |
+| CSS Class        | Used For                  |
+| ---------------- | ------------------------- |
+| `.hero-header`   | Top gradient banner       |
+| `.metric-card`   | Stats cards               |
+| `.feature-card`  | Feature description boxes |
+| `.success-alert` | Green notification boxes  |
+| `.warning-alert` | Red notification boxes    |
+| `.info-alert`    | Blue notification boxes   |
+| `.pred-row`      | Prediction result rows    |
 
 ### Adding a New Page
 
