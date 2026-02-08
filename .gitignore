@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Dataset (large files - download separately)
+dataset/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.lock
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyTorch checkpoints (optional - uncomment to ignore)
+# checkpoints/
+# *.pt
+# *.ckpt
+
+# Logs
+lightning_logs/
+*.log
+
+# Misc
+nul
+*.zip

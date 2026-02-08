@@ -1,0 +1,21 @@
+# TrustECG Streamlit Theme Configuration
+# Professional medical-themed dark/light mode with cardiac colors
+
+[theme]
+primaryColor = "#E63946"          # Heart red - primary accent
+backgroundColor = "#0F1419"        # Deep dark background
+secondaryBackgroundColor = "#1A1F26"  # Slightly lighter for cards
+textColor = "#F8F9FA"             # Clean white text
+font = "sans serif"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"

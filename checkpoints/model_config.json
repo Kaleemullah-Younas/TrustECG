@@ -1,0 +1,19 @@
+{
+  "num_leads": 12,
+  "sequence_length": 1000,
+  "num_classes": 5,
+  "encoder_channels": [
+    32,
+    64,
+    128
+  ],
+  "dropout": 0.3,
+  "target_cols": [
+    "NORM",
+    "MI",
+    "STTC",
+    "CD",
+    "HYP"
+  ],
+  "best_val_auroc": 0.9213183403400416
+}
