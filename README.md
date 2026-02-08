@@ -255,43 +255,51 @@ for cls, prob in zip(classes, probs):
 ```
 TrustECG/
 ├── src/
-│   ├── app/
-│   │   └── streamlit_app.py     # Streamlit dashboard
-│   ├── data/
-│   │   ├── datamodule.py        # Lightning DataModule
-│   │   ├── dataset.py           # ECG Dataset
-│   │   └── preprocessing.py     # Signal preprocessing
-│   ├── models/
-│   │   ├── ecg_net.py           # ExplainableECGNet
-│   │   ├── attention.py         # Attention mechanisms
-│   │   └── blocks.py            # Residual blocks
-│   ├── training/
-│   │   ├── trainer.py           # Training script
-│   │   └── metrics.py           # Evaluation metrics
-│   └── explainability/
-│       ├── attention_viz.py     # Attention visualization
-│       ├── gradcam.py           # Grad-CAM
-│       └── lime_explainer.py    # LIME explainer
+│   └── app/
+│       └── streamlit_app.py      # Dashboard + model + preprocessing (all-in-one)
 ├── notebooks/
-│   └── TrustECG_Complete.ipynb  # Full pipeline notebook
-├── checkpoints/                  # Trained model weights
-├── dataset/                      # PTB-XL dataset
-├── figures/                      # Visualizations
-├── reports/                      # Project documentation
-│   ├── TrustECG Report.pdf      # Detailed report
+│   └── TrustECG_Notebook.ipynb   # Full training & evaluation pipeline
+├── checkpoints/
+│   ├── trustecg_model.pt         # Trained model weights (best val AUROC)
+│   └── model_config.json         # Model hyperparameters
+├── dataset/                       # PTB-XL dataset (21,801 ECGs)
+│   ├── ptbxl_database.csv        # Patient metadata & labels
+│   ├── scp_statements.csv        # SCP diagnostic code definitions
+│   └── records100/               # 100 Hz ECG recordings
+├── figures/                       # Generated visualizations
+├── reports/
+│   ├── TrustECG Report.pdf       # Detailed project report
 │   └── TrustECG Report.docx
-├── docs/
-│   └── ARCHITECTURE.md          # Technical architecture
-└── pyproject.toml               # Dependencies
+├── docs/                          # Project documentation
+│   ├── index.md                  # Documentation home
+│   ├── getting-started.md        # Installation & first steps
+│   ├── data-pipeline.md          # Dataset, preprocessing, splits
+│   ├── architecture.md           # Model architecture deep-dive
+│   ├── training.md               # Training, loss, evaluation
+│   ├── explainability.md         # Attention & occlusion analysis
+│   ├── dashboard.md              # Streamlit app guide
+│   └── api-reference.md          # Class & function reference
+├── .streamlit/
+│   └── config.toml               # Dashboard theme configuration
+└── pyproject.toml                 # Dependencies & project metadata
 ```
 
 ---
 
 ## Documentation
 
-- **[Project Report](reports/TrustECG%20Report.pdf)** - Comprehensive documentation of methodology, results, and findings
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - Technical details of model architecture
-- **[Complete Notebook](notebooks/TrustECG_Complete.ipynb)** - Full training and evaluation pipeline
+| Document | Description |
+|----------|-------------|
+| [Documentation Home](docs/index.md) | Table of contents and project overview |
+| [Getting Started](docs/getting-started.md) | Installation, setup, and first prediction |
+| [Data Pipeline](docs/data-pipeline.md) | PTB-XL dataset, preprocessing, train/val/test splits |
+| [Model Architecture](docs/architecture.md) | ExplainableECGNet design, tensor shapes, and design decisions |
+| [Training Guide](docs/training.md) | Loss function, class weighting, evaluation metrics |
+| [Explainability](docs/explainability.md) | Attention visualization, occlusion analysis, clinical validation |
+| [Dashboard Guide](docs/dashboard.md) | Streamlit app pages, customization, deployment |
+| [API Reference](docs/api-reference.md) | Complete class and function documentation |
+| [Project Report](reports/TrustECG%20Report.pdf) | Full methodology, results, and findings |
+| [Training Notebook](notebooks/TrustECG_Notebook.ipynb) | End-to-end training and evaluation pipeline |
 
 ---
 

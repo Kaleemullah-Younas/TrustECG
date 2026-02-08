@@ -387,13 +387,20 @@ def load_model():
 
 # ==================== DATA LOADING ====================
 def load_ecg_by_id(ecg_id: int):
-    """Load and preprocess ECG from PTB-XL dataset."""
+    """Load and preprocess ECG from PTB-XL dataset (local or PhysioNet)."""
     try:
         import wfdb
 
         folder = (ecg_id - 1) // 1000 * 1000
-        path = f"dataset/records100/{folder:05d}/{ecg_id:05d}_lr"
-        record = wfdb.rdrecord(path)
+        record_name = f"records100/{folder:05d}/{ecg_id:05d}_lr"
+        local_path = f"dataset/{record_name}"
+
+        # Try local first, fall back to PhysioNet remote loading
+        try:
+            record = wfdb.rdrecord(local_path)
+        except FileNotFoundError:
+            record = wfdb.rdrecord(record_name, pn_dir="ptb-xl/1.0.3")
+
         return preprocessor(record.p_signal.T)
     except Exception as e:
         st.error(f"Error loading ECG {ecg_id}: {e}")
