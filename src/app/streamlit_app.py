@@ -399,7 +399,8 @@ def load_ecg_by_id(ecg_id: int):
         try:
             record = wfdb.rdrecord(local_path)
         except FileNotFoundError:
-            record = wfdb.rdrecord(record_name, pn_dir="ptb-xl/1.0.3")
+            remote_dir = f"ptb-xl/1.0.3/records100/{folder:05d}"
+            record = wfdb.rdrecord(f"{ecg_id:05d}_lr", pn_dir=remote_dir)
 
         return preprocessor(record.p_signal.T)
     except Exception as e:
